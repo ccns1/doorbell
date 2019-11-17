@@ -9,8 +9,12 @@ var httpServer = require('http');
 const ioServer = require('socket.io');
 const RTCMultiConnectionServer = require('rtcmulticonnection-server');
 
+const puppeteer = require('puppeteer');
+const ip = require('ip');
+
+
 var PORT = 9001;
-var isUseHTTPs = false;
+var isUseHTTPs = true;
 
 const jsonPath = {
     config: 'config.json',
@@ -21,6 +25,9 @@ const BASH_COLORS_HELPER = RTCMultiConnectionServer.BASH_COLORS_HELPER;
 const getValuesFromConfigJson = RTCMultiConnectionServer.getValuesFromConfigJson;
 const getBashParameters = RTCMultiConnectionServer.getBashParameters;
 const resolveURL = RTCMultiConnectionServer.resolveURL;
+
+var networkInterfaces = ip.address( );
+
 
 var config = getValuesFromConfigJson(jsonPath);
 config = getBashParameters(config, BASH_COLORS_HELPER);
@@ -39,7 +46,6 @@ function serverHandler(request, response) {
     // even if external codes are overriding it
     config = getValuesFromConfigJson(jsonPath);
     config = getBashParameters(config, BASH_COLORS_HELPER);
-
     // HTTP_GET handling code goes below
     try {
         var uri, filename;
@@ -128,10 +134,10 @@ function serverHandler(request, response) {
 
             if (filename.search(/demos/g) === -1 && filename.search(/admin/g) === -1 && stats.isDirectory() && config.homePage === '/demos/index.html') {
                 if (response.redirect) {
-                    response.redirect('/demos/');
+                    response.redirect('/demos/video-conferencing.html');
                 } else {
                     response.writeHead(301, {
-                        'Location': '/demos/'
+                        'Location': '/demos/video-conferencing.html'
                     });
                 }
                 response.end();
@@ -284,8 +290,68 @@ ioServer(httpApp).on('connection', function(socket) {
     if (!params.socketCustomEvent) {
         params.socketCustomEvent = 'custom-message';
     }
+    socket.on('call',function(message){
+        console.log(message)
+        socket.broadcast.emit('incomingCall', message);
+    })
 
+    socket.on('checkActiveCall',function(message){
+        console.log(message)
+        socket.broadcast.emit('checkCall', message);
+    })
     socket.on(params.socketCustomEvent, function(message) {
+      
         socket.broadcast.emit(params.socketCustomEvent, message);
     });
 });
+
+
+let browser;
+async function on(){
+    if(!browser){
+        browser = await puppeteer.launch({
+            ignoreHTTPSErrors:true,
+            headless:true ,
+            args: [ '--use-fake-ui-for-media-stream' ]
+
+        });
+        const page = await browser.newPage();
+
+        await page.goto('https://'+ip.address()+':'+PORT);
+    }
+}
+
+
+//comment below after implementing GPIO button
+on();
+
+
+
+console.log('**************************************************');
+console.log('**************************************************');
+console.log('**************************************************');
+console.log('**************************************************');
+console.log('**************************************************');
+
+console.log("\x1b[32m",'camera running on https://' + ip.address()+':'+PORT );
+
+console.log("\x1b[32m",'open client at https://' + ip.address()+':'+PORT +'/demos/client' );
+console.log("\x1b[0m",'**************************************************');
+console.log('**************************************************');
+console.log('**************************************************');
+console.log('**************************************************');
+console.log('**************************************************');
+console.log('**************************************************');
+
+
+
+
+console.log('**************************************************');
+console.log('**************************************************');
+console.log('**************************************************');
+console.log('\x1b[31m','IGNORE BELOW LOGS');
+
+console.log("\x1b[0m",'**************************************************');
+console.log('**************************************************');
+console.log('**************************************************');
+

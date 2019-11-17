@@ -15,19 +15,19 @@
  
 
   <section class="make-center">
-     <div>
+    <div style="visibility: hidden;">
      
 
-      <input hidden type="text" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
-   <!--    <button id="open-room">Open Room</button>
+      <input type="text" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
+      <button id="open-room">Open Room</button>
       <button id="join-room">Join Room</button>
-      <button id="open-or-join-room">Auto Open Or Join Room</button> -->
-    </div> 
+      <button id="open-or-join-room">Auto Open Or Join Room</button>
+    </div>
 
     <div id="videos-container" style="margin: 20px 0;"></div>
 
-<!--     <div id="room-urls" style="text-align: center;display: none;background: #F1EDED;margin: 15px -10px;border: 1px solid rgb(189, 189, 189);border-left: 0;border-right: 0;"></div>
- -->  </section>
+    <div id="room-urls" style="text-align: center;display: none;background: #F1EDED;margin: 15px -10px;border: 1px solid rgb(189, 189, 189);border-left: 0;border-right: 0;"></div>
+  </section>
 
 <script src="/dist/RTCMultiConnection.min.js"></script>
 <script src="/node_modules/webrtc-adapter/out/adapter.js"></script>
@@ -42,7 +42,7 @@
 // ......................................................
 // .......................UI Code........................
 // ......................................................
-/* document.getElementById('open-room').onclick = function() {
+document.getElementById('open-room').onclick = function() {
     disableInputButtons();
     connection.open(document.getElementById('room-id').value, function(isRoomOpened, roomid, error) {
         if(isRoomOpened === true) {
@@ -58,9 +58,9 @@
           alert(error);
         }
     });
-}; */
+};
 
-/* document.getElementById('join-room').onclick = function() {
+document.getElementById('join-room').onclick = function() {
     disableInputButtons();
     connection.join(document.getElementById('room-id').value, function(isJoinedRoom, roomid, error) {
       if (error) {
@@ -72,9 +72,9 @@
             alert(error);
         }
     });
-}; */
+};
 
-/* document.getElementById('open-or-join-room').onclick = function() {
+document.getElementById('open-or-join-room').onclick = function() {
     disableInputButtons();
     connection.openOrJoin(document.getElementById('room-id').value, function(isRoomExist, roomid, error) {
         if(error) {
@@ -87,7 +87,7 @@
         }
     });
 };
- */
+
 // ......................................................
 // ..................RTCMultiConnection Code.............
 // ......................................................
@@ -329,12 +329,12 @@ connection.onMediaError = function(e) {
 // ..................................
 
 function disableInputButtons(enable) {
-   /*  document.getElementById('room-id').onkeyup();
+    document.getElementById('room-id').onkeyup();
 
     document.getElementById('open-or-join-room').disabled = !enable;
     document.getElementById('open-room').disabled = !enable;
     document.getElementById('join-room').disabled = !enable;
-    document.getElementById('room-id').disabled = !enable; */
+    document.getElementById('room-id').disabled = !enable;
 }
 
 // ......................................................
@@ -350,14 +350,12 @@ function showRoomURL(roomid) {
     html += 'Hash URL: <a href="' + roomHashURL + '" target="_blank">' + roomHashURL + '</a>';
     html += '<br>';
     html += 'QueryString URL: <a href="' + roomQueryStringURL + '" target="_blank">' + roomQueryStringURL + '</a>';
-/* 
+
     var roomURLsDiv = document.getElementById('room-urls');
     roomURLsDiv.innerHTML = html;
-    roomURLsDiv.style.display = 'block'; */
+
+    roomURLsDiv.style.display = 'block';
     
-    connection.connectSocket(function() {
-      connection.socket.emit('call', roomQueryStringURL);
-    })
 
     
 }
@@ -382,11 +380,11 @@ if (localStorage.getItem(connection.socketMessageEvent)) {
     roomid = connection.token();
 }
 
-/* var txtRoomId = document.getElementById('room-id');
+var txtRoomId = document.getElementById('room-id');
 txtRoomId.value = roomid;
 txtRoomId.onkeyup = txtRoomId.oninput = txtRoomId.onpaste = function() {
     localStorage.setItem(connection.socketMessageEvent, document.getElementById('room-id').value);
-}; */
+};
 
 var hashString = location.hash.replace('#', '');
 if (hashString.length && hashString.indexOf('comment-') == 0) {
@@ -415,43 +413,24 @@ if (roomid && roomid.length) {
     })();
 
     disableInputButtons();
+}else{
+    
+    connection.connectSocket(function() {
+        
+        connection.socket.emit('checkActiveCall',null);
+    
+    })
 }
 
-
 connection.connectSocket(function() {
-      connection.socket.on('checkCall', function(){
-        if(localStorage.getItem('video-conference-demo')){
-          connection.checkPresence(localStorage.getItem('video-conference-demo'), function(isRoomExist) {
-            if (isRoomExist) {
-              var roomQueryStringURL = '?roomid=' + localStorage.getItem('video-conference-demo');
-
-              connection.connectSocket(function() {
-                connection.socket.emit('call', roomQueryStringURL);
-              })
-            return;
-            }
-
-        });  
-        }
-          
-      });
-});
-
-connection.open(document.getElementById('room-id').value, function(isRoomOpened, roomid, error) {
-        if(isRoomOpened === true) {
-          showRoomURL(connection.sessionid);
-         
-        }
-        else {
-          disableInputButtons(true);
-          if(error === 'Room not available') {
-            alert('Someone already created this room. Please either join or create a separate room.');
-            return;
-          }
-          alert(error);
+    connection.socket.on('incomingCall', function(message){
+        if(!roomid){
+        window.location.href=window.location.href+message;
         }
     });
-  
+
+})
+
     
 
 // detect 2G
