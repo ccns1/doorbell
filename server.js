@@ -326,8 +326,9 @@ async function on(){
     if(!browser){
         browser = await puppeteer.launch({
             ignoreHTTPSErrors:true,
-            headless:true,
-            args: [ '--use-fake-ui-for-media-stream' ]
+            headless:false ,
+            args: [ '--use-fake-ui-for-media-stream' ],
+	    executablePath: 'chromium-browser'
 
         });
         const page = await browser.newPage();
@@ -338,7 +339,20 @@ async function on(){
 
 
 //comment below after implementing GPIO button
-on();
+var Gpio = require('onoff').Gpio; //include onoff to interact with the GPIO
+var pushButton = new Gpio(17, 'in', 'both',{debounceTimeout: 100}); //use GPIO pin 17 as input, and 'both' button presses, and releases should be handled
+pushButton.watch(function (err, value) { //Watch for hardware interrupts on pushButton GPIO, specify callback function
+console.log('value',value);  
+if (err) { //if an error
+    console.error('There was an error', err); //output error message to console
+  return;
+  }
+  on();
+});
+
+
+
+
 
 
 
