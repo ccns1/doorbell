@@ -24,10 +24,30 @@
       <button id="open-or-join-room">Auto Open Or Join Room</button>
     </div>
 
+
     <div id="videos-container" style="margin: 20px 0;"></div>
 
     <div id="room-urls" style="text-align: center;display: none;background: #F1EDED;margin: 15px -10px;border: 1px solid rgb(189, 189, 189);border-left: 0;border-right: 0;"></div>
   </section>
+  <div id="peep" style="display: block;">
+        <p style="text-align:center;font-size:30px">No active call</p>
+        <button style="display:block;margin:0 auto;background: green;
+        box-shadow: none;
+        width: 150px;
+        height: 60PX;
+        font-size: 150%;">Peep</button>
+
+    </div>
+
+  <div id="incomingCall" style="visibility: hidden;">
+        <p style="text-align:center;font-size:30px">Incoming Call</p>
+        <button style="display:block;margin:0 auto;background: green;
+        box-shadow: none;
+        width: 150px;
+        height: 60PX;
+        font-size: 150%;">Answer</button>
+
+    </div>
 
 <script src="/dist/RTCMultiConnection.min.js"></script>
 <script src="/node_modules/webrtc-adapter/out/adapter.js"></script>
@@ -42,6 +62,8 @@
 // ......................................................
 // .......................UI Code........................
 // ......................................................
+document.getElementById('incomingCall').onclick=function(){answerCall()};
+
 document.getElementById('open-room').onclick = function() {
     disableInputButtons();
     connection.open(document.getElementById('room-id').value, function(isRoomOpened, roomid, error) {
@@ -93,6 +115,18 @@ document.getElementById('open-or-join-room').onclick = function() {
 // ......................................................
 
 var connection = new RTCMultiConnection();
+connection.onleave = function(event) {
+    var remoteUserId = event.userid;
+    var remoteUserFullName = event.extra.fullName;
+
+   if(connection.getAllParticipants().length==1){
+       console.log(window.location.protocol+'//'+window.location.host+'/demos/client.html')
+        window.location.href=window.location.protocol+'//'+window.location.host+'/demos/client.html'
+
+    }
+
+};
+
 
 // by default, socket.io server is assumed to be deployed on your own URL
 connection.socketURL = '/';
@@ -117,7 +151,7 @@ connection.sdpConstraints.mandatory = {
 var bitrates = 512;
 var resolutions = 'Ultra-HD';
 var videoConstraints = {};
-
+var callId=null;
 if (resolutions == 'HD') {
     videoConstraints = {
         width: {
@@ -379,7 +413,12 @@ if (localStorage.getItem(connection.socketMessageEvent)) {
 } else {
     roomid = connection.token();
 }
+if(!window.location.search){
+    document.getElementById('peep').setAttribute('style','display:block')
+}else{
+    document.getElementById('peep').setAttribute('style','display:none')
 
+}
 var txtRoomId = document.getElementById('room-id');
 txtRoomId.value = roomid;
 txtRoomId.onkeyup = txtRoomId.oninput = txtRoomId.onpaste = function() {
@@ -422,14 +461,32 @@ if (roomid && roomid.length) {
     })
 }
 
+
 connection.connectSocket(function() {
     connection.socket.on('incomingCall', function(message){
-        if(!roomid){
-        window.location.href=window.location.href+message;
+        if(!callId){
+            callId=message;
+            document.getElementById('incomingCall').setAttribute('style','visibility:visible')
+            document.getElementById('peep').setAttribute('style','display:none')
         }
     });
 
-})
+});
+
+
+
+function answerCall(){
+    window.location.href=window.location.href+callId;
+
+}
+
+document.getElementById('peep').onclick=function(){
+    connection.connectSocket(function() {
+        
+        connection.socket.emit('peep',null);
+    
+    })
+}
 
     
 

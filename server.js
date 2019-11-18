@@ -1,14 +1,10 @@
-// http://127.0.0.1:9001
-// http://localhost:9001
 
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
 var httpServer = require('http');
-
 const ioServer = require('socket.io');
 const RTCMultiConnectionServer = require('rtcmulticonnection-server');
-
 const puppeteer = require('puppeteer');
 const ip = require('ip');
 
@@ -290,6 +286,25 @@ ioServer(httpApp).on('connection', function(socket) {
     if (!params.socketCustomEvent) {
         params.socketCustomEvent = 'custom-message';
     }
+
+    socket.on('closeBrowser',function(message){
+        console.log('close browser')
+        if(browser){
+            console.log('closing browser')
+            browser.close();
+            browser=null;
+        }
+    })
+
+    socket.on('peep',function(message){
+        console.log('peep')
+        if(!browser){
+            console.log('peeping')
+            on()
+        }    
+    })
+
+
     socket.on('call',function(message){
         console.log(message)
         socket.broadcast.emit('incomingCall', message);
@@ -311,7 +326,7 @@ async function on(){
     if(!browser){
         browser = await puppeteer.launch({
             ignoreHTTPSErrors:true,
-            headless:true ,
+            headless:true,
             args: [ '--use-fake-ui-for-media-stream' ]
 
         });

@@ -93,7 +93,17 @@
 // ......................................................
 
 var connection = new RTCMultiConnection();
+connection.onleave = function(event) {
+    var remoteUserId = event.userid;
+    var remoteUserFullName = event.extra.fullName;
 
+   if(connection.getAllParticipants().length==1){
+       connection.connectSocket(function() {
+        connection.socket.emit('closeBrowser', null);
+      })
+    }
+
+};
 // by default, socket.io server is assumed to be deployed on your own URL
 connection.socketURL = '/';
 
@@ -226,6 +236,7 @@ connection.onstream = function(event) {
           video.setAttributeNode(document.createAttribute('muted'));
       } catch (e) {
           video.setAttribute('muted', true);
+          
       }
     }
     video.srcObject = event.stream;
@@ -323,6 +334,8 @@ connection.onMediaError = function(e) {
         connection.join(connection.sessionid);
     }
 };
+
+
 
 // ..................................
 // ALL below scripts are redundant!!!
