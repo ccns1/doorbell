@@ -35,6 +35,8 @@ Documentation - github.com/muaz-khan/WebRTC-Experiment/tree/master/getMediaEleme
     background: black;
     border: 1px solid rgb(107, 107, 107);
     margin: 1px;
+    display: flex;
+    align-items: center;
 }
 
 .media-controls, .volume-control {

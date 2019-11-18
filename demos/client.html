@@ -6,16 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="shortcut icon" href="/demos/logo.png">
   <link rel="stylesheet" href="/demos/stylesheet.css">
-  <script src="/demos/menu.js"></script>
 </head>
 <body>
  
-    
+    <audio style="display:none" controls>
+        <source src="./doorbell.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+      </audio>
 
  
 
   <section class="make-center">
-    <div style="visibility: hidden;">
+    <div style="display: none;">
      
 
       <input type="text" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
@@ -26,6 +28,8 @@
 
 
     <div id="videos-container" style="margin: 20px 0;"></div>
+    <div id="videos-container2" style="margin: 20px 0;"></div>
+
 
     <div id="room-urls" style="text-align: center;display: none;background: #F1EDED;margin: 15px -10px;border: 1px solid rgb(189, 189, 189);border-left: 0;border-right: 0;"></div>
   </section>
@@ -39,7 +43,7 @@
 
     </div>
 
-  <div id="incomingCall" style="visibility: hidden;">
+  <div id="incomingCall" style="display: none;">
         <p style="text-align:center;font-size:30px">Incoming Call</p>
         <button style="display:block;margin:0 auto;background: green;
         box-shadow: none;
@@ -264,16 +268,40 @@ connection.onstream = function(event) {
     }
     video.srcObject = event.stream;
 
-    var width = parseInt(connection.videosContainer.clientWidth / 3) - 20;
-    var mediaElement = getHTMLMediaElement(video, {
-        title: event.userid,
-        buttons: ['full-screen'],
-        width: width,
-        showOnMouseEnter: false
-    });
+            if(event.type=='local'){
+                var width = window.innerWidth-100;
+                if(width>800){
+                    width=800
+                }
+                var mediaElement = getHTMLMediaElement(video, {
+                    title: event.userid,
+                    buttons: [],
+                    width: width,
+                    height:'auto',
+                    showOnMouseEnter: false,
+                    controls:true
+                });  
+            }else{
+                var mediaElement = getHTMLMediaElement(video, {
+                    title: event.userid,
+                    buttons: [],
+                    width: 300,
+                    height:'auto',
+                    showOnMouseEnter: false,
+                    controls:true
+                });
+            }
+           
+        
+   
+    
+    console.log(mediaElement.videoTracks)
+    if(event.type!='local'){
+        document.getElementById('videos-container2').appendChild(mediaElement);
 
-    connection.videosContainer.appendChild(mediaElement);
-
+    }else{
+        connection.videosContainer.appendChild(mediaElement);
+    }
     setTimeout(function() {
         mediaElement.media.play();
     }, 5000);
@@ -466,7 +494,9 @@ connection.connectSocket(function() {
     connection.socket.on('incomingCall', function(message){
         if(!callId){
             callId=message;
-            document.getElementById('incomingCall').setAttribute('style','visibility:visible')
+            document.getElementsByTagName('audio')[0].play()
+
+            document.getElementById('incomingCall').setAttribute('style','display:block')
             document.getElementById('peep').setAttribute('style','display:none')
         }
     });

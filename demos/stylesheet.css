@@ -20,6 +20,12 @@ body {
     font-family: "Whitney SSm A", "Whitney SSm B", "Lato", "Lucida Grande", "Lucida Sans Unicode", Tahoma, Sans-Serif;
     font-size: 17px;
     line-height: 1.5em;
+    min-height: 100vh;
+    background: #1b2a49;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
@@ -71,8 +77,8 @@ header {
 }
 
 section, header {
-    border-bottom: 1px solid #95d4e7;
-}
+/*     border-bottom: 1px solid #95d4e7;
+ */}
 
 section, header, footer {
     padding: 5px 20px;
