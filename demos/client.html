@@ -14,11 +14,10 @@
       Your browser does not support the audio element.
       </audio> -->
 
- 
 
   <section class="make-center">
     <div style="display: none;">
-     
+
 
       <input type="text" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
       <button id="open-room">Open Room</button>
@@ -73,7 +72,7 @@ document.getElementById('open-room').onclick = function() {
     connection.open(document.getElementById('room-id').value, function(isRoomOpened, roomid, error) {
         if(isRoomOpened === true) {
           showRoomURL(connection.sessionid);
-         
+
         }
         else {
           disableInputButtons(true);
@@ -191,7 +190,7 @@ var CodecsHandler = connection.CodecsHandler;
 
 connection.processSdp = function(sdp) {
     var codecs = 'vp8';
-    
+
     if (codecs.length) {
         sdp = CodecsHandler.preferCodec(sdp, codecs.toLowerCase());
     }
@@ -481,9 +480,9 @@ function showRoomURL(roomid) {
     roomURLsDiv.innerHTML = html;
 
     roomURLsDiv.style.display = 'block';
-    
 
-    
+
+
 }
 
 (function() {
@@ -545,11 +544,11 @@ if (roomid && roomid.length) {
 
     disableInputButtons();
 }else{
-    
+
     connection.connectSocket(function() {
-        
+
         connection.socket.emit('checkActiveCall',null);
-    
+
     })
 }
 
@@ -577,13 +576,13 @@ function answerCall(){
 
 document.getElementById('peep').onclick=function(){
     connection.connectSocket(function() {
-        
+
         connection.socket.emit('peep',null);
-    
+
     })
 }
 
-    
+
 
 // detect 2G
 if(navigator.connection &&
