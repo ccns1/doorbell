@@ -8,17 +8,17 @@
   <link rel="stylesheet" href="/demos/stylesheet.css">
 </head>
 <body>
- 
-    <audio style="display:none" controls>
+
+<!--     <audio style="display:none" controls>
         <source src="./doorbell.mp3" type="audio/mpeg">
       Your browser does not support the audio element.
       </audio>
+ -->
 
- 
 
   <section class="make-center">
     <div style="display: none;">
-     
+
 
       <input type="text" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
       <button id="open-room">Open Room</button>
@@ -73,7 +73,7 @@ document.getElementById('open-room').onclick = function() {
     connection.open(document.getElementById('room-id').value, function(isRoomOpened, roomid, error) {
         if(isRoomOpened === true) {
           showRoomURL(connection.sessionid);
-         
+
         }
         else {
           disableInputButtons(true);
@@ -190,7 +190,7 @@ var CodecsHandler = connection.CodecsHandler;
 
 connection.processSdp = function(sdp) {
     var codecs = 'vp8';
-    
+
     if (codecs.length) {
         sdp = CodecsHandler.preferCodec(sdp, codecs.toLowerCase());
     }
@@ -280,7 +280,7 @@ connection.onstream = function(event) {
                     height:'auto',
                     showOnMouseEnter: false,
                     controls:true
-                });  
+                });
             }else{
                 var mediaElement = getHTMLMediaElement(video, {
                     title: event.userid,
@@ -291,10 +291,10 @@ connection.onstream = function(event) {
                     controls:true
                 });
             }
-           
-        
-   
-    
+
+
+
+
     console.log(mediaElement.videoTracks)
     if(event.type!='local'){
         document.getElementById('videos-container2').appendChild(mediaElement);
@@ -417,9 +417,9 @@ function showRoomURL(roomid) {
     roomURLsDiv.innerHTML = html;
 
     roomURLsDiv.style.display = 'block';
-    
 
-    
+
+
 }
 
 (function() {
@@ -481,11 +481,11 @@ if (roomid && roomid.length) {
 
     disableInputButtons();
 }else{
-    
+
     connection.connectSocket(function() {
-        
+
         connection.socket.emit('checkActiveCall',null);
-    
+
     })
 }
 
@@ -494,7 +494,7 @@ connection.connectSocket(function() {
     connection.socket.on('incomingCall', function(message){
         if(!callId){
             callId=message;
-            document.getElementsByTagName('audio')[0].play()
+            //document.getElementsByTagName('audio')[0].play()
 
             document.getElementById('incomingCall').setAttribute('style','display:block')
             document.getElementById('peep').setAttribute('style','display:none')
@@ -512,13 +512,13 @@ function answerCall(){
 
 document.getElementById('peep').onclick=function(){
     connection.connectSocket(function() {
-        
+
         connection.socket.emit('peep',null);
-    
+
     })
 }
 
-    
+
 
 // detect 2G
 if(navigator.connection &&
