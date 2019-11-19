@@ -51,15 +51,16 @@
     "canvas-designer": "latest",
     "detectrtc": "latest",
     "fbr": "latest",
+    "figlet": "^1.2.4",
     "getstats": "latest",
     "ip": "^1.1.5",
     "multistreamsmixer": "latest",
+    "onoff": "latest",
     "puppeteer": "^2.0.0",
     "recordrtc": "latest",
     "rtcmulticonnection-server": "latest",
     "socket.io": "latest",
-    "webrtc-adapter": "latest",
-    "onoff" : "latest"
+    "webrtc-adapter": "latest"
   },
   "analyze": false,
   "license": "MIT",

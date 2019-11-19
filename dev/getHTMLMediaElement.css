@@ -4,6 +4,7 @@ MIT License   - www.WebRTC-Experiment.com/licence
 Documentation - github.com/muaz-khan/WebRTC-Experiment/tree/master/getMediaElement
 */
 
+
 .media-container, .media-container * {
     margin: 0;
     padding: 0;
@@ -24,17 +25,19 @@ Documentation - github.com/muaz-khan/WebRTC-Experiment/tree/master/getMediaEleme
 .media-container {
     width: 36%;
     display: inline-block;
-    border: 1px solid rgb(0, 0, 0);
-    border-radius: 4px;
+/*  border: 1px solid rgb(0, 0, 0);
+   border-radius: 4px; */ 
     overflow: hidden;
     vertical-align: top;
-    background: white;
-}
+    margin:15px;
+    margin-top:0px
+/*     background: white;
+ */}
 
 .media-box {
     background: black;
-    border: 1px solid rgb(107, 107, 107);
-    margin: 1px;
+/*     border: 1px solid rgb(107, 107, 107);
+ */    margin: 1px;
     display: flex;
     align-items: center;
 }

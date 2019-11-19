@@ -7,6 +7,9 @@ const ioServer = require('socket.io');
 const RTCMultiConnectionServer = require('rtcmulticonnection-server');
 const puppeteer = require('puppeteer');
 const ip = require('ip');
+var figlet = require('figlet');
+ 
+
 
 
 var PORT = 9001;
@@ -269,7 +272,22 @@ if (isUseHTTPs) {
 
 RTCMultiConnectionServer.beforeHttpListen(httpApp, config);
 httpApp = httpApp.listen(process.env.PORT || PORT, process.env.IP || "0.0.0.0", function() {
-    RTCMultiConnectionServer.afterHttpListen(httpApp, config);
+    //RTCMultiConnectionServer.afterHttpListen(httpApp, config);
+    figlet('--SMART--DOOR--BELL-->', function(err, data) {
+        if (err) {
+            console.log("I'm not an artist!");
+            console.dir(err);
+            return;
+        }
+        console.log("\x1b[32m",'\n');
+        console.log(data);
+        console.log('\n');
+        console.log('\n');
+        console.log("\x1b[32m",'Camera running on https://' + ip.address()+':'+PORT );
+        console.log("\x1b[32m",'Client available on https://' + ip.address()+':'+PORT +'/demos/client.html' );
+        console.log("\x1b[0m",'\n');
+    });
+
 });
 
 // --------------------------
@@ -288,30 +306,30 @@ ioServer(httpApp).on('connection', function(socket) {
     }
 
     socket.on('closeBrowser',function(message){
-        console.log('close browser')
+        console.info('close browser')
         if(browser){
-            console.log('closing browser')
+            console.info('closing browser')
             browser.close();
             browser=null;
         }
     })
 
     socket.on('peep',function(message){
-        console.log('peep')
+        console.info('peep')
         if(!browser){
-            console.log('peeping')
+            console.info('peeping')
             on()
         }    
     })
 
 
     socket.on('call',function(message){
-        console.log(message)
+        console.info('new call',message)
         socket.broadcast.emit('incomingCall', message);
     })
 
     socket.on('checkActiveCall',function(message){
-        console.log(message)
+        console.info('check active call',message)
         socket.broadcast.emit('checkCall', message);
     })
     socket.on(params.socketCustomEvent, function(message) {
@@ -326,9 +344,8 @@ async function on(){
     if(!browser){
         browser = await puppeteer.launch({
             ignoreHTTPSErrors:true,
-            headless:false ,
-            args: [ '--use-fake-ui-for-media-stream' ],
-	    executablePath: 'chromium-browser'
+            headless:false,
+            args: [ '--use-fake-ui-for-media-stream' ]
 
         });
         const page = await browser.newPage();
@@ -338,7 +355,8 @@ async function on(){
 }
 
 
-//comment below after implementing GPIO button
+
+
 var Gpio = require('onoff').Gpio; //include onoff to interact with the GPIO
 var pushButton = new Gpio(17, 'in', 'both',{debounceTimeout: 100}); //use GPIO pin 17 as input, and 'both' button presses, and releases should be handled
 pushButton.watch(function (err, value) { //Watch for hardware interrupts on pushButton GPIO, specify callback function
@@ -356,31 +374,5 @@ if (err) { //if an error
 
 
 
-console.log('**************************************************');
-console.log('**************************************************');
-console.log('**************************************************');
-console.log('**************************************************');
-console.log('**************************************************');
 
-console.log("\x1b[32m",'camera running on https://' + ip.address()+':'+PORT );
-
-console.log("\x1b[32m",'open client at https://' + ip.address()+':'+PORT +'/demos/client' );
-console.log("\x1b[0m",'**************************************************');
-console.log('**************************************************');
-console.log('**************************************************');
-console.log('**************************************************');
-console.log('**************************************************');
-console.log('**************************************************');
-
-
-
-
-console.log('**************************************************');
-console.log('**************************************************');
-console.log('**************************************************');
-console.log('\x1b[31m','IGNORE BELOW LOGS');
-
-console.log("\x1b[0m",'**************************************************');
-console.log('**************************************************');
-console.log('**************************************************');
 

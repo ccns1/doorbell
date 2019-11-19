@@ -252,3 +252,9 @@ button[disabled], input[disabled] {
         box-shadow: rgb(84, 145, 208) 0px 1px 0px 0px!important;
     }
 }
+
+/* .videos-container2>video{
+    margin : 0 auto!important;
+    width:auto!important;
+    max-height: 167px!important;
+} */

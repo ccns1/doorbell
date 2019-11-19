@@ -9,10 +9,10 @@
 </head>
 <body>
  
-    <audio style="display:none" controls>
+    <!-- <audio style="display:none" controls>
         <source src="./doorbell.mp3" type="audio/mpeg">
       Your browser does not support the audio element.
-      </audio>
+      </audio> -->
 
  
 
@@ -119,12 +119,13 @@ document.getElementById('open-or-join-room').onclick = function() {
 // ......................................................
 
 var connection = new RTCMultiConnection();
+
+
+
 connection.onleave = function(event) {
     var remoteUserId = event.userid;
     var remoteUserFullName = event.extra.fullName;
-
    if(connection.getAllParticipants().length==1){
-       console.log(window.location.protocol+'//'+window.location.host+'/demos/client.html')
         window.location.href=window.location.protocol+'//'+window.location.host+'/demos/client.html'
 
     }
@@ -238,6 +239,8 @@ connection.iceServers = [{
 
 connection.videosContainer = document.getElementById('videos-container');
 connection.onstream = function(event) {
+    document.getElementById('peep').setAttribute('style','display:none')
+    document.getElementById('incomingCall').setAttribute('style','display:none')
     var existing = document.getElementById(event.streamid);
     if(existing && existing.parentNode) {
       existing.parentNode.removeChild(existing);
@@ -268,6 +271,58 @@ connection.onstream = function(event) {
     }
     video.srcObject = event.stream;
 
+    console.log(event.stream)
+
+     Object.keys(connection.streamEvents).forEach(function(streamid) {
+        var e = connection.streamEvents[streamid];
+        if(event.stream.streamid==streamid){
+            console.log(e.userid)
+
+            if(connection.getAllParticipants().indexOf(e.userid)==0){
+                console.log(1)
+                var width = window.innerWidth-100;
+                if(width>800){
+                    width=800
+                }
+                var mediaElement = getHTMLMediaElement(video, {
+                    title: event.userid,
+                    buttons: [],
+                    width: width,
+                    height:'auto',
+                    showOnMouseEnter: true,
+                    controls:false
+                });
+                connection.videosContainer.appendChild(mediaElement);
+
+ 
+            }else{
+                console.log(2)
+                video.onplay=function(){
+                    setTimeout(function(){
+                        console.log("playing")
+                        if(video.videoHeight>video.videoWidth){
+                            video.setAttribute('style','height:167px;width:auto;margin:0 auto')
+                        }
+                    },5000)
+                   
+                }
+                var mediaElement = getHTMLMediaElement(video, {
+                    title: event.userid,
+                    buttons: [],
+                    width: 300,
+                    height:'auto',
+                    showOnMouseEnter: true,
+                    controls:false
+                });
+                document.getElementById('videos-container2').appendChild(mediaElement);
+
+            }
+        }
+        
+    }); 
+    video.setAttribute('controls',true)
+
+/* 
             if(event.type=='local'){
                 var width = window.innerWidth-100;
                 if(width>800){
@@ -278,34 +333,43 @@ connection.onstream = function(event) {
                     buttons: [],
                     width: width,
                     height:'auto',
-                    showOnMouseEnter: false,
-                    controls:true
+                    showOnMouseEnter: true,
+                    controls:false
                 });  
             }else{
+                video.onplay=function(){
+                    setTimeout(function(){
+                        console.log("playing")
+                        if(video.videoHeight>video.videoWidth){
+                            video.setAttribute('style','height:167px;width:auto;margin:0 auto')
+                        }
+                    },5000)
+                   
+                }
                 var mediaElement = getHTMLMediaElement(video, {
                     title: event.userid,
                     buttons: [],
                     width: 300,
                     height:'auto',
-                    showOnMouseEnter: false,
-                    controls:true
+                    showOnMouseEnter: true,
+                    controls:false
                 });
-            }
+            } */
            
-        
+       
    
-    
-    console.log(mediaElement.videoTracks)
+  /*   
+    console.log(video)
     if(event.type!='local'){
         document.getElementById('videos-container2').appendChild(mediaElement);
 
     }else{
         connection.videosContainer.appendChild(mediaElement);
-    }
-    setTimeout(function() {
+    } */
+    /* setTimeout(function() {
         mediaElement.media.play();
     }, 5000);
-
+ */
     mediaElement.id = event.streamid;
 
     // to keep room-id in cache
@@ -441,12 +505,12 @@ if (localStorage.getItem(connection.socketMessageEvent)) {
 } else {
     roomid = connection.token();
 }
-if(!window.location.search){
+/* if(!window.location.search){
     document.getElementById('peep').setAttribute('style','display:block')
 }else{
     document.getElementById('peep').setAttribute('style','display:none')
 
-}
+} */
 var txtRoomId = document.getElementById('room-id');
 txtRoomId.value = roomid;
 txtRoomId.onkeyup = txtRoomId.oninput = txtRoomId.onpaste = function() {
@@ -494,7 +558,7 @@ connection.connectSocket(function() {
     connection.socket.on('incomingCall', function(message){
         if(!callId){
             callId=message;
-            document.getElementsByTagName('audio')[0].play()
+            //document.getElementsByTagName('audio')[0].play()
 
             document.getElementById('incomingCall').setAttribute('style','display:block')
             document.getElementById('peep').setAttribute('style','display:none')
@@ -506,7 +570,8 @@ connection.connectSocket(function() {
 
 
 function answerCall(){
-    window.location.href=window.location.href+callId;
+    window.location.href=window.location.protocol+'//'+window.location.host+'/demos/client.html'+callId;
+
 
 }
 
