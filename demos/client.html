@@ -2,23 +2,21 @@
 <html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8">
-  <title>Video Conferencing using RTCMultiConnection</title>
+  <title>Doorbell</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="shortcut icon" href="/demos/logo.png">
   <link rel="stylesheet" href="/demos/stylesheet.css">
 </head>
 <body>
  
-    <!-- <audio style="display:none" controls>
+    <audio id="bell" style="display:none" controls>
         <source src="./doorbell.mp3" type="audio/mpeg">
       Your browser does not support the audio element.
-      </audio> -->
+      </audio>
 
 
-  <section class="make-center">
+  <div class="make-center">
     <div style="display: none;">
-
-
       <input type="text" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
       <button id="open-room">Open Room</button>
       <button id="join-room">Join Room</button>
@@ -31,8 +29,9 @@
 
 
     <div id="room-urls" style="text-align: center;display: none;background: #F1EDED;margin: 15px -10px;border: 1px solid rgb(189, 189, 189);border-left: 0;border-right: 0;"></div>
-  </section>
-  <div id="peep" style="display: block;">
+</div>
+<div style="display:block;justify-content: center;align-items: center;margin-top: 150px;">
+    <div id="peep" style="display: block;">
         <p style="text-align:center;font-size:30px">No active call</p>
         <button style="display:block;margin:0 auto;background: green;
         box-shadow: none;
@@ -41,9 +40,9 @@
         font-size: 150%;">Peep</button>
 
     </div>
+    <div id="incomingCall" style="display: none;">
+    <p style="text-align:center;font-size:30px">Incoming Call</p>
 
-  <div id="incomingCall" style="display: none;">
-        <p style="text-align:center;font-size:30px">Incoming Call</p>
         <button style="display:block;margin:0 auto;background: green;
         box-shadow: none;
         width: 150px;
@@ -51,6 +50,17 @@
         font-size: 150%;">Answer</button>
 
     </div>
+
+
+    <div id="hangup" style="display: none;margin-top:15px!important">
+        <button style="display:block;margin:0 auto;background: red;
+        box-shadow: none;
+        width: 150px;
+        height: 60px;
+        font-size: 150%;margin-top:10px">Hang Up</button>
+    </div>
+</div>
+  
 
 <script src="/dist/RTCMultiConnection.min.js"></script>
 <script src="/node_modules/webrtc-adapter/out/adapter.js"></script>
@@ -66,6 +76,10 @@
 // .......................UI Code........................
 // ......................................................
 document.getElementById('incomingCall').onclick=function(){answerCall()};
+function answerCall(){   
+    window.location.reload();
+   // window.location.href=window.location.protocol+'//'+window.location.host+'/demos/client.html'+callId;
+}
 
 document.getElementById('open-room').onclick = function() {
     disableInputButtons();
@@ -118,19 +132,6 @@ document.getElementById('open-or-join-room').onclick = function() {
 // ......................................................
 
 var connection = new RTCMultiConnection();
-
-
-
-connection.onleave = function(event) {
-    var remoteUserId = event.userid;
-    var remoteUserFullName = event.extra.fullName;
-   if(connection.getAllParticipants().length==1){
-        window.location.href=window.location.protocol+'//'+window.location.host+'/demos/client.html'
-
-    }
-
-};
-
 
 // by default, socket.io server is assumed to be deployed on your own URL
 connection.socketURL = '/';
@@ -240,11 +241,11 @@ connection.videosContainer = document.getElementById('videos-container');
 connection.onstream = function(event) {
     document.getElementById('peep').setAttribute('style','display:none')
     document.getElementById('incomingCall').setAttribute('style','display:none')
+    document.getElementById('hangup').setAttribute('style','display:block');
     var existing = document.getElementById(event.streamid);
     if(existing && existing.parentNode) {
       existing.parentNode.removeChild(existing);
     }
-
     event.mediaElement.removeAttribute('src');
     event.mediaElement.removeAttribute('srcObject');
     event.mediaElement.muted = true;
@@ -270,116 +271,50 @@ connection.onstream = function(event) {
     }
     video.srcObject = event.stream;
 
-    console.log(event.stream)
-
-     Object.keys(connection.streamEvents).forEach(function(streamid) {
-        var e = connection.streamEvents[streamid];
-        if(event.stream.streamid==streamid){
-            console.log(e.userid)
-
-            if(connection.getAllParticipants().indexOf(e.userid)==0){
-                console.log(1)
-                var width = window.innerWidth-100;
-                if(width>800){
-                    width=800
-                }
-                var mediaElement = getHTMLMediaElement(video, {
-                    title: event.userid,
-                    buttons: [],
-                    width: width,
-                    height:'auto',
-                    showOnMouseEnter: true,
-                    controls:false
-                });
-                connection.videosContainer.appendChild(mediaElement);
-
- 
-            }else{
-                console.log(2)
-                video.onplay=function(){
-                    setTimeout(function(){
-                        console.log("playing")
-                        if(video.videoHeight>video.videoWidth){
-                            video.setAttribute('style','height:167px;width:auto;margin:0 auto')
-                        }
-                    },5000)
-                   
-                }
-                var mediaElement = getHTMLMediaElement(video, {
-                    title: event.userid,
-                    buttons: [],
-                    width: 300,
-                    height:'auto',
-                    showOnMouseEnter: true,
-                    controls:false
-                });
-                document.getElementById('videos-container2').appendChild(mediaElement);
-
-            }
+    if(connection.getAllParticipants().indexOf(event.userid)==0){
+        var width = window.innerWidth-100;
+        if(width>800){
+            width=800
         }
-        
-    }); 
-    video.setAttribute('controls',true)
-
-/* 
-            if(event.type=='local'){
-                var width = window.innerWidth-100;
-                if(width>800){
-                    width=800
-                }
-                var mediaElement = getHTMLMediaElement(video, {
-                    title: event.userid,
-                    buttons: [],
-                    width: width,
-                    height:'auto',
-                    showOnMouseEnter: true,
-                    controls:false
-                });  
-            }else{
-                video.onplay=function(){
-                    setTimeout(function(){
-                        console.log("playing")
-                        if(video.videoHeight>video.videoWidth){
-                            video.setAttribute('style','height:167px;width:auto;margin:0 auto')
-                        }
-                    },5000)
-                   
-                }
-                var mediaElement = getHTMLMediaElement(video, {
-                    title: event.userid,
-                    buttons: [],
-                    width: 300,
-                    height:'auto',
-                    showOnMouseEnter: true,
-                    controls:false
-                });
-            } */
-           
-       
-   
-  /*   
-    console.log(video)
-    if(event.type!='local'){
-        document.getElementById('videos-container2').appendChild(mediaElement);
-
-    }else{
+        var mediaElement = getHTMLMediaElement(video, {
+            title: event.userid,
+            buttons: [],
+            width: width,
+            height:'auto',
+            showOnMouseEnter: true,
+            controls:false
+        });
         connection.videosContainer.appendChild(mediaElement);
-    } */
-    /* setTimeout(function() {
-        mediaElement.media.play();
-    }, 5000);
- */
+    }else{
+        console.log(2)
+        video.onplay=function(){
+            setTimeout(function(){
+                console.log("playing")
+                if(video.videoHeight>video.videoWidth){
+                    video.setAttribute('style','height:167px;width:auto;margin:0 auto')
+                }
+            },5000)
+            
+        }
+        var mediaElement = getHTMLMediaElement(video, {
+            title: event.userid,
+            buttons: [],
+            width: 300,
+            height:'auto',
+            showOnMouseEnter: true,
+            controls:false
+        });
+        document.getElementById('videos-container2').appendChild(mediaElement);
+    }
+    video.setAttribute('controls',true);
     mediaElement.id = event.streamid;
-
     // to keep room-id in cache
     localStorage.setItem(connection.socketMessageEvent, connection.sessionid);
-
+    localStorage.setItem('roomId',connection.sessionid)
     chkRecordConference.parentNode.style.display = 'none';
-
     if(chkRecordConference.checked === true) {
       btnStopRecording.style.display = 'inline-block';
       recordingStatus.style.display = 'inline-block';
-
       var recorder = connection.recorder;
       if(!recorder) {
         recorder = RecordRTC([event.stream], {
@@ -399,7 +334,6 @@ connection.onstream = function(event) {
       connection.recorder.streams.push(event.stream);
       recordingStatus.innerHTML = 'Recording ' + connection.recorder.streams.length + ' streams';
     }
-
     if(event.type === 'local') {
       connection.socket.on('disconnect', function() {
         if(!connection.getAllParticipants().length) {
@@ -409,22 +343,6 @@ connection.onstream = function(event) {
     }
 };
 
-/* var recordingStatus = document.getElementById('recording-status');
-var chkRecordConference = document.getElementById('record-entire-conference');
-var btnStopRecording = document.getElementById('btn-stop-recording');
-btnStopRecording.onclick = function() {
-  var recorder = connection.recorder;
-  if(!recorder) return alert('No recorder found.');
-  recorder.stopRecording(function() {
-    var blob = recorder.getBlob();
-    invokeSaveAsDialog(blob);
-
-    connection.recorder = null;
-    btnStopRecording.style.display = 'none';
-    recordingStatus.style.display = 'none';
-    chkRecordConference.parentNode.style.display = 'inline-block';
-  });
-}; */
 
 connection.onstreamended = function(event) {
     var mediaElement = document.getElementById(event.streamid);
@@ -485,7 +403,7 @@ function showRoomURL(roomid) {
 
 }
 
-(function() {
+/* (function() {
     var params = {},
         r = /([^&=]+)=?([^&]*)/g;
 
@@ -496,21 +414,21 @@ function showRoomURL(roomid) {
     while (match = r.exec(search.substring(1)))
         params[d(match[1])] = d(match[2]);
     window.params = params;
-})();
-
+})(); */
+/* 
 var roomid = '';
 if (localStorage.getItem(connection.socketMessageEvent)) {
     roomid = localStorage.getItem(connection.socketMessageEvent);
 } else {
     roomid = connection.token();
-}
+} */
 /* if(!window.location.search){
     document.getElementById('peep').setAttribute('style','display:block')
 }else{
     document.getElementById('peep').setAttribute('style','display:none')
 
 } */
-var txtRoomId = document.getElementById('room-id');
+/* var txtRoomId = document.getElementById('room-id');
 txtRoomId.value = roomid;
 txtRoomId.onkeyup = txtRoomId.oninput = txtRoomId.onpaste = function() {
     localStorage.setItem(connection.socketMessageEvent, document.getElementById('room-id').value);
@@ -525,29 +443,27 @@ var roomid = params.roomid;
 if (!roomid && hashString.length) {
     roomid = hashString;
 }
-
+ */
+var roomid = localStorage.getItem('roomId');
 if (roomid && roomid.length) {
-    document.getElementById('room-id').value = roomid;
-    localStorage.setItem(connection.socketMessageEvent, roomid);
-
     // auto-join-room
-    (function reCheckRoomPresence() {
-        connection.checkPresence(roomid, function(isRoomExist) {
-            if (isRoomExist) {
-                connection.join(roomid);
-                return;
-            }
+    connection.checkPresence(roomid, function(isRoomExist) {
+        if (isRoomExist) {
+            connection.join(roomid);
+            
+        }else{
+        localStorage.removeItem('roomId');
+        document.getElementById('peep').setAttribute('style','display:block');
+        }
+    });
 
-            setTimeout(reCheckRoomPresence, 5000);
-        });
-    })();
 
-    disableInputButtons();
+  //  disableInputButtons();
 }else{
-
     connection.connectSocket(function() {
-
         connection.socket.emit('checkActiveCall',null);
+        localStorage.removeItem('roomId');
+        document.getElementById('peep').setAttribute('style','display:block');
 
     })
 }
@@ -555,11 +471,12 @@ if (roomid && roomid.length) {
 
 connection.connectSocket(function() {
     connection.socket.on('incomingCall', function(message){
-        if(!callId){
-            callId=message;
-            //document.getElementsByTagName('audio')[0].play()
-
+        if(!localStorage.getItem('roomId')||localStorage.getItem('roomId')!=message){
+            localStorage.setItem('roomId',message);
+            document.getElementsByTagName('audio')[0].play()
             document.getElementById('incomingCall').setAttribute('style','display:block')
+            document.getElementById('hangup').setAttribute('style','display:block')
+
             document.getElementById('peep').setAttribute('style','display:none')
         }
     });
@@ -567,12 +484,26 @@ connection.connectSocket(function() {
 });
 
 
+connection.connectSocket(function() {
+    connection.socket.on('kill', function(message){
+        localStorage.removeItem('roomId');
+        window.location.reload();
+    });
 
-function answerCall(){
-    window.location.href=window.location.protocol+'//'+window.location.host+'/demos/client.html'+callId;
+});
+
+connection.onleave = function(event) {
+    var remoteUserId = event.userid;
+    var remoteUserFullName = event.extra.fullName;
+   if(connection.getAllParticipants().length==1){
+        window.location.href=window.location.protocol+'//'+window.location.host+'/demos/client.html'
+
+    }
+
+};
 
 
-}
+
 
 document.getElementById('peep').onclick=function(){
     connection.connectSocket(function() {
@@ -583,7 +514,10 @@ document.getElementById('peep').onclick=function(){
 }
 
 
-
+document.getElementById('hangup').onclick=function(){
+    localStorage.removeItem('roomId');
+    window.location.reload();
+}
 // detect 2G
 if(navigator.connection &&
    navigator.connection.type === 'cellular' &&

@@ -10,9 +10,6 @@
 </head>
 <body>
  
-    
-
- 
 
   <section class="make-center">
      <div>
@@ -29,13 +26,13 @@
 <!--     <div id="room-urls" style="text-align: center;display: none;background: #F1EDED;margin: 15px -10px;border: 1px solid rgb(189, 189, 189);border-left: 0;border-right: 0;"></div>
  -->  </section>
 
-<script src="/dist/RTCMultiConnection.min.js"></script>
 <script src="/node_modules/webrtc-adapter/out/adapter.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 
 <!-- custom layout for HTML5 audio/video elements -->
 <link rel="stylesheet" href="/dev/getHTMLMediaElement.css">
 <script src="/dev/getHTMLMediaElement.js"></script>
+<script src="/dist/RTCMultiConnection.min.js"></script>
 
 <script src="/node_modules/recordrtc/RecordRTC.js"></script>
 <script>
@@ -369,7 +366,13 @@ function showRoomURL(roomid) {
     roomURLsDiv.style.display = 'block'; */
     
     connection.connectSocket(function() {
-      connection.socket.emit('call', roomQueryStringURL);
+      connection.socket.emit('call', roomid);
+      setTimeout(function(){
+        if(!connection.getAllParticipants().length){
+          connection.socket.emit('kill', null);
+
+        }
+      },20000)
     })
 
     
@@ -439,7 +442,7 @@ connection.connectSocket(function() {
               var roomQueryStringURL = '?roomid=' + localStorage.getItem('video-conference-demo');
 
               connection.connectSocket(function() {
-                connection.socket.emit('call', roomQueryStringURL);
+                connection.socket.emit('activeCall', localStorage.getItem('video-conference-demo'));
               })
             return;
             }

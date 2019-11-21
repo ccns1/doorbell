@@ -8,6 +8,7 @@ const RTCMultiConnectionServer = require('rtcmulticonnection-server');
 const puppeteer = require('puppeteer');
 const ip = require('ip');
 var figlet = require('figlet');
+var onoff 
  
 
 
@@ -157,23 +158,23 @@ function serverHandler(request, response) {
                     'Content-Type': 'text/html'
                 });
 
-                if (filename.indexOf(resolveURL('/demos/MultiRTC/')) !== -1) {
+                /* if (filename.indexOf(resolveURL('/demos/MultiRTC/')) !== -1) {
                     filename = filename.replace(resolveURL('/demos/MultiRTC/'), '');
                     filename += resolveURL('/demos/MultiRTC/index.html');
-                } else if (filename.indexOf(resolveURL('/admin/')) !== -1) {
+                } */ /* else if (filename.indexOf(resolveURL('/admin/')) !== -1) {
                     filename = filename.replace(resolveURL('/admin/'), '');
                     filename += resolveURL('/admin/index.html');
                 } else if (filename.indexOf(resolveURL('/demos/dashboard/')) !== -1) {
                     filename = filename.replace(resolveURL('/demos/dashboard/'), '');
                     filename += resolveURL('/demos/dashboard/index.html');
-                } else if (filename.indexOf(resolveURL('/demos/video-conference/')) !== -1) {
+                } else*/ if (filename.indexOf(resolveURL('/demos/video-conference/')) !== -1) {
                     filename = filename.replace(resolveURL('/demos/video-conference/'), '');
                     filename += resolveURL('/demos/video-conference/index.html');
-                } else if (filename.indexOf(resolveURL('/demos')) !== -1) {
+                }/*  else if (filename.indexOf(resolveURL('/demos')) !== -1) {
                     filename = filename.replace(resolveURL('/demos/'), '');
                     filename = filename.replace(resolveURL('/demos'), '');
-                    filename += resolveURL('/demos/index.html');
-                } else {
+                    filename += resolveURL('/demos/.html');
+                } */ else {
                     filename += resolveURL(config.homePage);
                 }
             }
@@ -321,6 +322,16 @@ ioServer(httpApp).on('connection', function(socket) {
             on()
         }    
     })
+    socket.on('kill',function(message){
+        console.info('kill')
+        if(browser){
+            console.info('killing')
+            browser.close();
+            browser=null;
+            socket.broadcast.emit('kill', message);
+
+        }    
+    })
 
 
     socket.on('call',function(message){
@@ -328,6 +339,10 @@ ioServer(httpApp).on('connection', function(socket) {
         socket.broadcast.emit('incomingCall', message);
     })
 
+    socket.on('activeCall',function(message){
+        console.info('new call',message)
+        socket.broadcast.emit('activeCall', message);
+    })
     socket.on('checkActiveCall',function(message){
         console.info('check active call',message)
         socket.broadcast.emit('checkCall', message);
@@ -345,7 +360,8 @@ async function on(){
         browser = await puppeteer.launch({
             ignoreHTTPSErrors:true,
             headless:false,
-            args: [ '--use-fake-ui-for-media-stream' ]
+            args: [ '--use-fake-ui-for-media-stream' ],
+            executablePath: 'chromium-browser'
 
         });
         const page = await browser.newPage();
@@ -353,7 +369,6 @@ async function on(){
         await page.goto('https://'+ip.address()+':'+PORT);
     }
 }
-
 
 
 

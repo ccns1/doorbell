@@ -15,9 +15,13 @@ function getHTMLMediaElement(mediaElement, config) {
         try {
             mediaElement.setAttributeNode(document.createAttribute('autoplay'));
             mediaElement.setAttributeNode(document.createAttribute('playsinline'));
+            mediaElement.setAttributeNode(document.createAttribute('controls'));
+
         } catch (e) {
             mediaElement.setAttribute('autoplay', true);
             mediaElement.setAttribute('playsinline', true);
+            mediaElement.setAttribute('controls', true);
+
         }
 
         if ('srcObject' in mediaElement) {
