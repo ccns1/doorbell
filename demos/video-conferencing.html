@@ -36,7 +36,6 @@
 
 <script src="/node_modules/recordrtc/RecordRTC.js"></script>
 <script>
-console.log(navigator.mediaDevices.getSupportedConstraints())
 // ......................................................
 // .......................UI Code........................
 // ......................................................
@@ -94,7 +93,8 @@ var connection = new RTCMultiConnection();
 connection.onleave = function(event) {
     var remoteUserId = event.userid;
     var remoteUserFullName = event.extra.fullName;
-
+console.log(event)
+console.log(connection.getAllParticipants())
    if(connection.getAllParticipants().length==1){
        connection.connectSocket(function() {
         connection.socket.emit('closeBrowser', null);

@@ -516,10 +516,7 @@ document.getElementById('peep').onclick=function(){
 
 document.getElementById('hangup').onclick=function(){
     localStorage.removeItem('roomId');
-alert(connection.getAllParticipants().length)
-alert(2)
 	connection.getAllParticipants().forEach(function(participantId) {
-alert(1)
 	    connection.disconnectWith( participantId );
 	});
     window.location.reload();
