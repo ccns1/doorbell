@@ -55,12 +55,14 @@
     "getstats": "latest",
     "ip": "^1.1.5",
     "multistreamsmixer": "latest",
+    "node-hotspot": "^0.1.7",
     "onoff": "latest",
     "puppeteer": "^2.0.0",
     "recordrtc": "latest",
     "rtcmulticonnection-server": "latest",
     "socket.io": "latest",
-    "webrtc-adapter": "latest"
+    "webrtc-adapter": "latest",
+    "wiring-pi": "^2.2.1"
   },
   "analyze": false,
   "license": "MIT",

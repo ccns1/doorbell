@@ -36,6 +36,7 @@
 
 <script src="/node_modules/recordrtc/RecordRTC.js"></script>
 <script>
+console.log(navigator.mediaDevices.getSupportedConstraints())
 // ......................................................
 // .......................UI Code........................
 // ......................................................
@@ -122,7 +123,7 @@ connection.sdpConstraints.mandatory = {
 // STAR_FIX_VIDEO_AUTO_PAUSE_ISSUES
 // via: https://github.com/muaz-khan/RTCMultiConnection/issues/778#issuecomment-524853468
 var bitrates = 512;
-var resolutions = 'Ultra-HD';
+var resolutions = 'HD';
 var videoConstraints = {};
 
 if (resolutions == 'HD') {
@@ -137,7 +138,7 @@ if (resolutions == 'HD') {
     };
 }
 
-if (resolutions == 'Ultra-HD') {
+if (resolutions  == 'Ultra-HD') {
     videoConstraints = {
         width: {
             ideal: 1920

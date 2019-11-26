@@ -312,6 +312,7 @@ ioServer(httpApp).on('connection', function(socket) {
             console.info('closing browser')
             browser.close();
             browser=null;
+     		browserCalled=null;
         }
     })
 
@@ -328,6 +329,7 @@ ioServer(httpApp).on('connection', function(socket) {
             console.info('killing')
             browser.close();
             browser=null;
+     	    browserCalled=null;
             socket.broadcast.emit('kill', message);
 
         }    
@@ -355,6 +357,8 @@ ioServer(httpApp).on('connection', function(socket) {
 
 
 let browser;
+let browserCalled;
+
 async function on(){
     if(!browser){
         browser = await puppeteer.launch({
@@ -373,15 +377,21 @@ async function on(){
 
 
 var Gpio = require('onoff').Gpio; //include onoff to interact with the GPIO
-var pushButton = new Gpio(17, 'in', 'both',{debounceTimeout: 100}); //use GPIO pin 17 as input, and 'both' button presses, and releases should be handled
+var pushButton = new Gpio(4, 'in', 'rising', {debounceTimeout: 10}); //use GPIO pin 17 as input, and 'both' button presses, and releases should be handled
 pushButton.watch(function (err, value) { //Watch for hardware interrupts on pushButton GPIO, specify callback function
 console.log('value',value);  
 if (err) { //if an error
     console.error('There was an error', err); //output error message to console
   return;
   }
-  on();
+  if(!browser&&!browserCalled){
+     browesrCalled=true;
+     on();
+  }
+  
 });
+
+
 
 
 
