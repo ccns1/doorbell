@@ -21,7 +21,7 @@ body {
     font-size: 17px;
     line-height: 1.5em;
     min-height: 100vh;
-    background: #1b2a49;
+    background: #111216;
     color: #fff;
     display: block;
     justify-content: center;
@@ -253,8 +253,11 @@ button[disabled], input[disabled] {
     }
 }
 
-/* .videos-container2>video{
-    margin : 0 auto!important;
-    width:auto!important;
-    max-height: 167px!important;
-} */
+ #videos-container>video{
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: cover;
+    transition: opacity 1s;
+    width: 100%;
+} 
